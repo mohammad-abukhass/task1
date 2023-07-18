@@ -1,41 +1,32 @@
 <?php
-$languages = [];
+$sourceFolder = getcwd(); 
+ 
 
-while (true) {
-    $language = readline("Enter the language (or 'exit' to quit): ");
-
-    if ($language === 'exit') {
-        break;
-    }
-
-    $languageCode = strtok($language, '-');
-
-    if (!file_exists($languageCode)) {
-        if (!mkdir($languageCode)) {
-            die("Failed to create the language folder.");
-        }
-    }
-
-    $languageFile = fopen($language . '.txt', 'w');
-    fclose($languageFile);
-
-    if (!rename($language . '.txt', $languageCode . '/' . $language . '.txt')) {
-        die("Failed to move the language file.");
-    }
-
-    echo "Folder created, language file created, and file moved successfully!\n";
-    $languages[] = $languageCode;
+if (!file_exists("attachments")) {
+    mkdir("attachments", 0777, true);
 }
 
-if (!mkdir('attachments')) {
-    die("Failed to create the attachments folder.");
-}
+$textFiles = glob($sourceFolder . "/*.txt");
 
-foreach ($languages as $language) {
-    rename($language, 'attachments/' . $language);
-}
+foreach ($textFiles as $textFile) {
+    $fileName = basename($textFile);
+    $languageCode = substr($fileName, 0, 2);
+    $languageFolder = "attachments" . "/" . $languageCode;
 
-echo "All language folders transferred to the attachments folder.\n";
+   
+    if (!file_exists($languageFolder)) {
+        mkdir($languageFolder, 0777, true);
+    }
+
+    $destinationFilePath = $languageFolder . "/" . $fileName;
+
+    
+    if (rename($textFile, $destinationFilePath)) {
+        echo "File transferred: " . $fileName . "\n";
+    } else {
+        echo "Failed to transfer file: " . $fileName . "\n";
+    }
+}
 ?>
 
 
